@@ -1,0 +1,45 @@
+On master:
+
+sudo apt-get update
+sudo apt-get install wget
+wget "https://apt.puppetlabs.com/puppet-release-bionic.deb"
+sudo dpkg -i puppet-release-bionic.deb
+sudo apt-get install puppetmaster
+apt policy puppetmaster
+sudo systemctl status puppet-master.service
+vim /etc/default/puppet-master
+    -- JAVA_ARGS="-Xms512m -Xms512m"
+sudo systemctl restart puppet-master.service
+
+sudo ufw allow 8140/tcp
+
+//change code
+
+sudo mkdir -p /etc/puppet/code/environments/production/manifests/
+sudo nano /etc/puppet/code/environments/production/manifests/site.puppet
+
+file {'/tmp/it_works.txt': # resource type file and filename
+    ensure => present,
+    mode => '0644',
+    content => "it works on ${ipaddress_eth0}!\n",
+}
+
+On Slave:
+
+sudo apt-get update
+sudo apt-get install wget
+wget "https://apt.puppetlabs.com/puppet-release-bionic.deb"
+sudo dpkg -i puppet-release-bionic.deb
+sudo apt-get install puppet
+
+sudo systemctl start puppet
+sudo systemctl enable puppet
+
+
+add more config in hosts : /etc/hosts
+123.12.1.2 puppetmaster on server
+23.233.32.3 puppet on slave
+
+On puppet master:
+sudo puppet cert list
+sudo puppet cert sign --all
